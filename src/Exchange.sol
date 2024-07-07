@@ -75,4 +75,23 @@ function addLiquidity(uint256 _amountofToken)public payable returns(uint256){
     
 
 }
+
+//remove adding liquidity now possible
+
+function removeLiquidity(uint256 _amountOfLpTokens)public returns(uint256,uint256){
+    //check the user balance greater than 0   
+    require(_amountOfLpTokens >0,"Amount should be greater than 0");
+    uint256 ethreserveBalance = address(this).balance;
+    uint256 ipTokenTotalSupply = totalSupply();
+
+    //calculate the amount of eth and tokens to return to user
+    uint256 ethToReturn = (ethreserveBalance * _amountOfLpTokens)/ipTokenTotalSupply;
+    uint256 tokenToReturn = (getReserve() * _amountOfLpTokens)/ipTokenTotalSupply;
+
+    // Burn the LP tokens from the user, and transfer the ETH and tokens to the user
+    _burn(msg.sender, _amountOfLpTokens);
+    payable(msg.sender).transfer(ethToReturn);
+    ERC20(tokenAddress).transfer(msg.sender,tokenToReturn);
+    return (ethToReturn,tokenToReturn);
+}
 }
